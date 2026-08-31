@@ -1,106 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-const ALFASTORE_URL =
-  "https://app.alfastore.co.id/prd/api/so/utility/get_jadwal";
+export async function GET(request: Request) {
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
 
-    const storeId = searchParams.get("storeId");
+  const storeId = searchParams.get("storeId");
 
-    if (!storeId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "storeId wajib diisi",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+  if (!storeId) {
+    return NextResponse.json({
+      success: false,
+      message: "storeId wajib diisi"
+    });
+  }
 
 
-    const apiUrl =
-      `${ALFASTORE_URL}` +
-      `?storeId=${encodeURIComponent(storeId)}`;
-
-
-    const response = await fetch(apiUrl, {
+  const response = await fetch(
+    `https://app.alfastore.co.id/prd/api/so/utility/get_jadwal?storeId=${storeId}`,
+    {
       method: "GET",
-
       headers: {
         "App-Name": "SO-PDA",
         "Version-App": "V.2026.04.13.01-alfa",
         "Version-Code": "28",
-
+        "Api-Key": "iVOZX9MLmKrj1L8R23uF1aryMR1vGMXG",
         "User-Agent":
-          "Dalvik/2.1.0 (Linux; U; Android 11; PM75 Build/RKQ1.210518.002)",
-
-        "Platform": "ANDROID",
-
-        "Api-Key":
-          "ivOZx9MLmkrj1L8R23uFlaryMR1VGMXG",
-
-        "Accept-Encoding": "gzip",
-
-        "Connection": "Keep-Alive",
-
-        "Host": "app.alfastore.co.id",
-      },
-
-      cache: "no-store",
-    });
-
-
-    const contentType =
-      response.headers.get("content-type") || "";
-
-
-    const data = await response.text();
-
-
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "AlfaStore API error",
-          status: response.status,
-          response: data,
-        },
-        {
-          status: response.status,
-        }
-      );
+          "Dalvik/2.1.0 (Linux; U; Android 11; PM75 Build/RKQ1.210518.002)"
+      }
     }
+  );
 
 
-    let result;
+  const data = await response.text();
 
 
-    try {
-      result = JSON.parse(data);
-    } catch {
-      result = data;
+  return new NextResponse(data, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json"
     }
+  });
 
-
-    return NextResponse.json({
-      success: true,
-      contentType,
-      data: result,
-    });
-
-
-  } catch (error) {
-
-    console.error(
-      "GET JADWAL ERROR:",
-      error
-    );
-
-
-    return NextResponse.json(
-      {
-        success: false,
+}
